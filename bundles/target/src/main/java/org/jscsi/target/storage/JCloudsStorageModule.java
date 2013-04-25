@@ -246,15 +246,16 @@ public class JCloudsStorageModule implements IStorageModule {
 			throws InterruptedException, ExecutionException {
 		for (int i = pBucketStartId; i < pBucketStartId + BUCKETS_TO_PREFETCH; i++) {
 			byte[] data = mByteCache.getIfPresent(i);
-			if (data == null) {
+			if (data == null) { 
+				//Reading bucket of i  is excuting, we can just wait
 				if (mRunningReadTasks.containsKey(i)) {
 					mRunningReadTasks.remove(i).get();
-				}
-				mRunningReadTasks
+				}else{
+				//Reading bucket of i is not excuting
+					mRunningReadTasks
 						.put(i, mReaderService.submit(new ReadTask(i)));
-			} else {
-				mByteCache.put(i, data);
-			}
+				}
+			} 
 		}
 
 	}
